@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Data.SqlClient;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApiCore.Controllers
 {
@@ -20,7 +21,7 @@ namespace ApiCore.Controllers
         public string usuario(Usuarios usuario)
         {
             SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Saap").ToString());
-            SqlCommand cmd = new SqlCommand("INSERT INTO Usuarios(NombreUsuario,Password) VALUES ('" + usuario.NombreUsuario + "','" + usuario.Password + "')", con);
+            SqlCommand cmd = new SqlCommand("INSERT INTO Usuarios(Usuario,Password) VALUES ('" + usuario.Usuario + "','" + usuario.Password + "')", con);
             con.Open();
             int i = cmd.ExecuteNonQuery();
             con.Close();
@@ -51,17 +52,46 @@ namespace ApiCore.Controllers
             {
                 lista.Add(new Usuarios
                 {
-                    Id = (int)dataReader["id"],
-                    NombreUsuario = dataReader["NombreUsuario"].ToString(),
+                    Id = (int)dataReader["IdUsuario"],
+                    Nombre = dataReader["Nombre"].ToString(),
+                    ApellidoPaterno = dataReader["ApellidoPaterno"].ToString(),
+                    ApellidoMaterno = dataReader["ApellidoMaterno"].ToString(),
+                    Usuario = dataReader["Usuario"].ToString(),
                     Password = dataReader["Password"].ToString(),
-                    EsActivo = (bool)dataReader["EsActivo"],
-                    FechaCreacion = (DateTime)dataReader["FechaCreacion"]
+                    EstadoUSuario = (bool)dataReader["EstadoUSuario"],
+                    FechaCreacionRegistro = (DateTime)dataReader["FechaCreacionRegistro"]
 
                 });
             }
             con.Close();
             return lista;
         }
+
+        [HttpPost]
+        [Route("validausuario")]
+        public Usuarios validausuario(Usuarios usuario)
+        {
+            Usuarios valida = new Usuarios();
+
+            SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Saap").ToString());
+            SqlCommand cmd = new SqlCommand("dbo.SPConsultaUsuarios", con);
+            cmd.CommandType = System.Data.CommandType.StoredProcedure;
+            cmd.Parameters.Add("@usuario", System.Data.SqlDbType.VarChar, 25).Value = usuario.Usuario;
+            cmd.Parameters.Add("@password", System.Data.SqlDbType.VarChar, 25).Value = usuario.Password;
+            con.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                valida.Valido = (bool)reader["valido"];
+                valida.Nombre = reader["nombre"].ToString();
+                valida.ApellidoPaterno = reader["apaterno"].ToString();
+                valida.ApellidoMaterno = reader["amaterno"].ToString();
+            }
+
+            con.Close();
+            return valida;
+        }
+
 
     }
 }
