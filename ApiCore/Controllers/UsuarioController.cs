@@ -86,6 +86,7 @@ namespace ApiCore.Controllers
                 valida.Nombre = reader["nombre"].ToString();
                 valida.ApellidoPaterno = reader["apaterno"].ToString();
                 valida.ApellidoMaterno = reader["amaterno"].ToString();
+                valida.IdCompania = (int)reader["idCompania"];
             }
 
             con.Close();

@@ -16,15 +16,18 @@ namespace ApiCore.Controllers
         }
 
         [HttpGet]
-        [Route("listainventario")]
+        [Route("listainventario/{idCompania}")]
 
-        public List<Inventario> listarInventario()
+        public ActionResult<List<Inventario>> listarInventario(int idCompania)
         {
-            List<Inventario> lista = new List<Inventario>();
+            try
+            {
+                List<Inventario> lista = new List<Inventario>();
 
             SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Saap").ToString());
             SqlCommand cmd = new SqlCommand("dbo.SPConsultaInventario", con);
             cmd.CommandType = System.Data.CommandType.StoredProcedure;
+            cmd.Parameters.Add("@idcompania", System.Data.SqlDbType.Int).Value = idCompania;
             con.Open();
             SqlDataReader dataReader = cmd.ExecuteReader();
             while (dataReader.Read())
@@ -57,6 +60,11 @@ namespace ApiCore.Controllers
             }
             con.Close();
             return lista;
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("No se pudo listar el inventario. Detalles del error: " + ex.Message);
+            }
         }
     }
 }

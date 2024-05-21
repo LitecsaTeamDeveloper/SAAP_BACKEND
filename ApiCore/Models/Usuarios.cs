@@ -11,6 +11,6 @@
         public bool? EstadoUSuario { get; set; }
         public DateTime? FechaCreacionRegistro { get; set; }
         public bool? Valido { get; set; }
-
+        public int? IdCompania { get; set; }
     }
 }
