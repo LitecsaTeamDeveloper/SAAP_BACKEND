@@ -1,10 +1,13 @@
 ﻿using ApiCore.Models;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Data.SqlClient;
 
+
 namespace ApiCore.Controllers
 {
+    [EnableCors("ReglasCors")]
     [Route("api/[controller]")]
     [ApiController]
     public class CatalogosController : ControllerBase
@@ -43,7 +46,7 @@ namespace ApiCore.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest("No se pudo listar el Numero de Parte. Detalles del error: " + ex.Message);
+                return BadRequest("No se pudo listar el catalogo de Numero de Parte. Detalles del error: " + ex.Message);
             }
         }
 
@@ -75,7 +78,7 @@ namespace ApiCore.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest("No se pudo listar los diametros. Detalles del error: " + ex.Message);
+                return BadRequest("No se pudo listar el catalogo de diametros. Detalles del error: " + ex.Message);
             }
         }
 
@@ -107,7 +110,7 @@ namespace ApiCore.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest("No se pudo listar las ubicaciones. Detalles del error: " + ex.Message);
+                return BadRequest("No se pudo listar el catalogo de ubicaciones. Detalles del error: " + ex.Message);
             }
         }
 
@@ -139,7 +142,7 @@ namespace ApiCore.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest("No se pudo listar los estatus. Detalles del error: " + ex.Message);
+                return BadRequest("No se pudo listar el catalogo de estatus. Detalles del error: " + ex.Message);
             }
         }
         [HttpGet]
@@ -170,7 +173,7 @@ namespace ApiCore.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest("No se pudo listar los rangos. Detalles del error: " + ex.Message);
+                return BadRequest("No se pudo listar el catalogo de rangos. Detalles del error: " + ex.Message);
             }
         }
 
@@ -202,7 +205,39 @@ namespace ApiCore.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest("No se pudo listar los grados. Detalles del error: " + ex.Message);
+                return BadRequest("No se pudo listar el catalogo de grados. Detalles del error: " + ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("listaconexion")]
+
+        public ActionResult<List<CatConexion>> listarConexion()
+        {
+            try
+            {
+                List<CatConexion> lista = new List<CatConexion>();
+
+                SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Saap").ToString());
+                SqlCommand cmd = new SqlCommand("dbo.SPConsultaCatConexion", con);
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                con.Open();
+                SqlDataReader dataReader = cmd.ExecuteReader();
+                while (dataReader.Read())
+                {
+                    lista.Add(new CatConexion
+                    {
+                        Id = (int)dataReader["IdConexion"],
+                        Conexion = dataReader["Conexion"].ToString(),
+
+                    });
+                }
+                con.Close();
+                return lista;
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("No se pudo listar el catalogo de conexiones. Detalles del error: " + ex.Message);
             }
         }
 
