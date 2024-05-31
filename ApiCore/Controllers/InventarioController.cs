@@ -49,8 +49,6 @@ namespace ApiCore.Controllers
                     IdDiametroExterior = (int)dataReader["IdDiametroExterior"],
                     DiametroExterior = (decimal)dataReader["DiametroExteriorDecimal"],
                     Longitud = (decimal)dataReader["Longitud"],
-                    IdUbicacion = (int)dataReader["IdUbicacion"],
-                    Ubicacion = dataReader["Ubicacion"].ToString(),
                     IdRango = (int)dataReader["IdRango"],
                     Rango = dataReader["Rango"].ToString(),
                     IdConexion = (int)dataReader["IdConexion"],
@@ -94,7 +92,6 @@ namespace ApiCore.Controllers
             cmd.Parameters.Add("@IdDiametroExte", System.Data.SqlDbType.Int).Value = inventario.IdDiametroExterior;
             cmd.Parameters.Add("@Longitud", System.Data.SqlDbType.Decimal).Value = inventario.Longitud;
             cmd.Parameters.Add("@Bending", System.Data.SqlDbType.Decimal).Value = inventario.Bending;
-            cmd.Parameters.Add("@IdUbicacion", System.Data.SqlDbType.Int).Value = inventario.IdUbicacion;
             cmd.Parameters.Add("@IdRango", System.Data.SqlDbType.Int).Value = inventario.IdRango;
             cmd.Parameters.Add("@FechaIngreso", System.Data.SqlDbType.DateTime).Value = inventario.FechaIngreso;
             cmd.Parameters.Add("@Esnuevo", System.Data.SqlDbType.Bit).Value = inventario.EsNuevo;
@@ -157,7 +154,6 @@ namespace ApiCore.Controllers
                     inventa.IdDiametroInterior = (int)dataReader["IdDiametroInterior"];
                     inventa.IdDiametroExterior = (int)dataReader["IdDiametroExterior"];
                     inventa.Longitud = (decimal)dataReader["Longitud"];
-                    inventa.IdUbicacion = (int)dataReader["IdUbicacion"];
                     inventa.IdRango = (int)dataReader["IdRango"];
                     inventa.IdGrado = (int)dataReader["IdGrado"];
                     inventa.IdConexion = (int)dataReader["IdConexion"];
@@ -177,6 +173,44 @@ namespace ApiCore.Controllers
             catch (Exception ex)
             {
                 return BadRequest("No se pudo obtener el inventario. Detalles del error: " + ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("eliminainventario")]
+        public IActionResult EliminarInventario(Inventario inventario)
+        {
+            try
+            {
+
+               
+
+                SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Saap").ToString());
+                SqlCommand cmd = new SqlCommand("dbo.SPNuevoEditaCatTubo", con);
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                cmd.Parameters.Add("@IdTubo", System.Data.SqlDbType.VarChar, 30).Value = inventario.IdInventario;
+                cmd.Parameters.Add("@NuevoEdita", System.Data.SqlDbType.Char, 1).Value = inventario.TipoRegistro;
+                cmd.Parameters.Add("@FechaIngreso", System.Data.SqlDbType.DateTime).Value = inventario.FechaIngreso;
+
+                con.Open();
+                int i = 0;
+                i = cmd.ExecuteNonQuery();
+                con.Close();
+
+                if (i == -1)
+                {
+                    return Ok(new { message = "Ok" });
+                }
+                else
+                {
+                    return StatusCode(500, new { message = "No se pudo eliminar la información" });
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "No se pudo eliminar la información. Detalles del error: " + ex.Message });
+
             }
         }
 

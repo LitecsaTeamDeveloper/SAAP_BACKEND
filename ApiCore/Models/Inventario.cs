@@ -14,8 +14,6 @@
         public int? IdDiametroExterior { get; set; }
         public decimal? DiametroExterior { get; set; }
         public decimal? Longitud { get; set; }
-        public int? IdUbicacion { get; set; }
-        public string? Ubicacion { get; set; }
         public int? IdRango { get; set; }
         public string? Rango { get; set; }
         public int? IdGrado { get; set; }
