@@ -81,7 +81,7 @@ namespace ApiCore.Controllers
             Inventario datosinventario = new Inventario();
 
             SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Saap").ToString());
-            SqlCommand cmd = new SqlCommand("dbo.SPNuevoEditaCatTubo", con);
+            SqlCommand cmd = new SqlCommand("dbo.SPCRUDCatTubo", con);
             cmd.CommandType = System.Data.CommandType.StoredProcedure;
             cmd.Parameters.Add("@IdTubo", System.Data.SqlDbType.VarChar, 30).Value = inventario.IdInventario;
             cmd.Parameters.Add("@RFID", System.Data.SqlDbType.VarChar, 30).Value = inventario.Rfid;
@@ -99,7 +99,7 @@ namespace ApiCore.Controllers
             cmd.Parameters.Add("@IdConexion", System.Data.SqlDbType.Int).Value = inventario.IdConexion;
             cmd.Parameters.Add("@IdGrado", System.Data.SqlDbType.Int).Value = inventario.IdGrado;
             cmd.Parameters.Add("@IdEstatus", System.Data.SqlDbType.Int).Value = inventario.IdEstatus;
-            cmd.Parameters.Add("@NuevoEdita", System.Data.SqlDbType.Char,1).Value = inventario.TipoRegistro;
+            cmd.Parameters.Add("@Operacion", System.Data.SqlDbType.Char,1).Value = inventario.TipoRegistro;
                 //var returnValueParameter = new SqlParameter("@ReturnValue", SqlDbType.Int);
                 //cmd.Parameters.Add(returnValueParameter);
 
@@ -126,19 +126,21 @@ namespace ApiCore.Controllers
             }
         }
 
-        [HttpGet]
-        [Route("obtieneinventario/{idInventario}")]
 
-        public ActionResult<Inventario> obtenerInventario(int idInventario)
+        [HttpPost]
+        [Route("obtieneinventario")]
+
+        public ActionResult<Inventario> obtenerInventario(Inventario inventario)
         {
             try
             {
                 Inventario inventa = new Inventario();
 
                 SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Saap").ToString());
-                SqlCommand cmd = new SqlCommand("dbo.SPConsultaInventarioIndividual", con);
+                SqlCommand cmd = new SqlCommand("dbo.SPCRUDCatTubo", con);
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                cmd.Parameters.Add("@IdTubo", System.Data.SqlDbType.Int).Value = idInventario;
+                cmd.Parameters.Add("@IdTubo", System.Data.SqlDbType.VarChar, 30).Value = inventario.IdInventario;
+                cmd.Parameters.Add("@Operacion", System.Data.SqlDbType.Char, 1).Value = inventario.TipoRegistro;
                 con.Open();
                 SqlDataReader dataReader = cmd.ExecuteReader();
 
@@ -163,7 +165,7 @@ namespace ApiCore.Controllers
                     inventa.IdEstatus = (int)dataReader["idEstatus"];
                     inventa.FechaIngreso = (DateTime)dataReader["FechaIngreso"];
 
-               }
+                }
 
 
 
@@ -186,11 +188,10 @@ namespace ApiCore.Controllers
                
 
                 SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Saap").ToString());
-                SqlCommand cmd = new SqlCommand("dbo.SPNuevoEditaCatTubo", con);
+                SqlCommand cmd = new SqlCommand("dbo.SPCRUDCatTubo", con);
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
                 cmd.Parameters.Add("@IdTubo", System.Data.SqlDbType.VarChar, 30).Value = inventario.IdInventario;
-                cmd.Parameters.Add("@NuevoEdita", System.Data.SqlDbType.Char, 1).Value = inventario.TipoRegistro;
-                cmd.Parameters.Add("@FechaIngreso", System.Data.SqlDbType.DateTime).Value = inventario.FechaIngreso;
+                cmd.Parameters.Add("@Operacion", System.Data.SqlDbType.Char, 1).Value = inventario.TipoRegistro;
 
                 con.Open();
                 int i = 0;
