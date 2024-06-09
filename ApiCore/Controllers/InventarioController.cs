@@ -45,9 +45,9 @@ namespace ApiCore.Controllers
                     Compania = dataReader["Compania"].ToString(),
                     Descripcion = dataReader["Descripcion"].ToString(),
                     IdDiametroInterior = (int)dataReader["IdDiametroInterior"],
-                    DiametroInterior = (decimal)dataReader["DiametroInteriorDecimal"],
+                    DiametroInteriorFraccion = dataReader["DiametroInteriorFraccion"].ToString(),
                     IdDiametroExterior = (int)dataReader["IdDiametroExterior"],
-                    DiametroExterior = (decimal)dataReader["DiametroExteriorDecimal"],
+                    DiametroExteriorFraccion = dataReader["DiametroExteriorFraccion"].ToString(),
                     Longitud = (decimal)dataReader["Longitud"],
                     IdRango = (int)dataReader["IdRango"],
                     Rango = dataReader["Rango"].ToString(),
@@ -139,7 +139,7 @@ namespace ApiCore.Controllers
                 SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Saap").ToString());
                 SqlCommand cmd = new SqlCommand("dbo.SPCRUDCatTubo", con);
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                cmd.Parameters.Add("@IdTubo", System.Data.SqlDbType.VarChar, 30).Value = inventario.IdInventario;
+                cmd.Parameters.Add("@IdTubo", System.Data.SqlDbType.Int).Value = inventario.IdInventario;
                 cmd.Parameters.Add("@Operacion", System.Data.SqlDbType.Char, 1).Value = inventario.TipoRegistro;
                 con.Open();
                 SqlDataReader dataReader = cmd.ExecuteReader();
@@ -212,6 +212,98 @@ namespace ApiCore.Controllers
             {
                 return StatusCode(500, new { message = "No se pudo eliminar la información. Detalles del error: " + ex.Message });
 
+            }
+        }
+
+        [HttpGet]
+        [Route("listainventariodisponible/{idCompania}")]
+
+        public ActionResult<List<Inventario>> listarInventarioDisponible(int idCompania)
+        {
+            try
+            {
+                List<Inventario> lista = new List<Inventario>();
+
+                SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Saap").ToString());
+                SqlCommand cmd = new SqlCommand("dbo.SPConsultaInventarioDisponible", con);
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                cmd.Parameters.Add("@idcompania", System.Data.SqlDbType.Int).Value = idCompania;
+                con.Open();
+                SqlDataReader dataReader = cmd.ExecuteReader();
+                while (dataReader.Read())
+                {
+                    lista.Add(new Inventario
+                    {
+                        IdInventario = (int)dataReader["IdTubo"],
+                        Rfid = dataReader["RFID"].ToString(),
+                        IdNumeroParte = (int)dataReader["IdNumeroParte"],
+                        NumeroParte = dataReader["NumeroParte"].ToString(),
+                        idCompania = (int)dataReader["IdCompania"],
+                        Compania = dataReader["Compania"].ToString(),
+                        Descripcion = dataReader["Descripcion"].ToString(),
+                        IdDiametroInterior = (int)dataReader["IdDiametroInterior"],
+                        DiametroInteriorFraccion = dataReader["DiametroInteriorFraccion"].ToString(),
+                        IdDiametroExterior = (int)dataReader["IdDiametroExterior"],
+                        DiametroExteriorFraccion = dataReader["DiametroExteriorFraccion"].ToString(),
+                        Longitud = (decimal)dataReader["Longitud"],
+                        IdRango = (int)dataReader["IdRango"],
+                        Rango = dataReader["Rango"].ToString(),
+                        IdConexion = (int)dataReader["IdConexion"],
+                        Conexion = dataReader["Conexion"].ToString(),
+                        Libraje = (decimal)dataReader["Libraje"],
+                        EsNuevo = (bool)dataReader["esNuevo"],
+                        Bending = (decimal)dataReader["Bending"],
+                        IdEstatus = (int)dataReader["idEstatus"],
+                        Estatus = dataReader["Estatus"].ToString(),
+                        FechaIngreso = (DateTime)dataReader["FechaIngreso"]
+
+                    });
+                }
+                con.Close();
+                return lista;
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("No se pudo listar el inventario. Detalles del error: " + ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("validarfid/{rfid}")]
+
+        public ActionResult<bool> validarfid(string rfid)
+        {
+            try
+            {
+               bool valida = false;
+
+                SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Saap").ToString());
+                SqlCommand cmd = new SqlCommand("dbo.SPValidaRfid", con);
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                cmd.Parameters.Add("@rfid", System.Data.SqlDbType.VarChar,30).Value = rfid;
+                SqlParameter returnValueParameter = new SqlParameter("@result", SqlDbType.Int);
+                returnValueParameter.Direction = System.Data.ParameterDirection.Output;
+                cmd.Parameters.Add(returnValueParameter);
+                con.Open();
+       
+                cmd.ExecuteNonQuery();
+
+                int resultado = Convert.ToInt32(returnValueParameter.Value);
+                con.Close();
+
+                if (resultado == 1)
+                {
+                    return false;
+                } else
+                {
+                    return true;
+                }
+
+                
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("Ha ocurrido un error, vuelva a iniciar sesión. Detalles del error: " + ex.Message);
             }
         }
 

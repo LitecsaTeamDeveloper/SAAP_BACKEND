@@ -10,9 +10,11 @@
         public string? Compania { get; set; }
         public string? Descripcion { get; set; }
         public int? IdDiametroInterior { get; set; }
-        public decimal? DiametroInterior { get; set; }
+        public decimal? DiametroInteriorDecimal { get; set; }
+        public string? DiametroInteriorFraccion { get; set; }
         public int? IdDiametroExterior { get; set; }
-        public decimal? DiametroExterior { get; set; }
+        public decimal? DiametroExteriorDecimal { get; set; }
+        public string? DiametroExteriorFraccion { get; set; }
         public decimal? Longitud { get; set; }
         public int? IdRango { get; set; }
         public string? Rango { get; set; }

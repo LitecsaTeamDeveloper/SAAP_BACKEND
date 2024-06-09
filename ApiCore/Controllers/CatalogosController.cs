@@ -241,5 +241,37 @@ namespace ApiCore.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("listapozo")]
+
+        public ActionResult<List<CatPozo>> listarPozo()
+        {
+            try
+            {
+                List<CatPozo> lista = new List<CatPozo>();
+
+                SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Saap").ToString());
+                SqlCommand cmd = new SqlCommand("dbo.SPConsultaCatPozo", con);
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                con.Open();
+                SqlDataReader dataReader = cmd.ExecuteReader();
+                while (dataReader.Read())
+                {
+                    lista.Add(new CatPozo
+                    {
+                        Id = (int)dataReader["IdPozo"],
+                        Pozo = dataReader["Pozo"].ToString(),
+
+                    });
+                }
+                con.Close();
+                return lista;
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("No se pudo listar el catalogo de pozos. Detalles del error: " + ex.Message);
+            }
+        }
+
     }
 }
