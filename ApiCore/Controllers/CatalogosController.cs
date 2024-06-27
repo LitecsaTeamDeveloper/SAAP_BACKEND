@@ -273,5 +273,38 @@ namespace ApiCore.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("listaetapa")]
+
+        public ActionResult<List<CatEtapa>> listarEtapa()
+        {
+            try
+            {
+                List<CatEtapa> lista = new List<CatEtapa>();
+
+                SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Saap").ToString());
+                SqlCommand cmd = new SqlCommand("dbo.SPConsultaCatEtapa", con);
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                con.Open();
+                SqlDataReader dataReader = cmd.ExecuteReader();
+                while (dataReader.Read())
+                {
+                    lista.Add(new CatEtapa
+                    {
+                        Id = (int)dataReader["IdEtapa"],
+                        Etapa = dataReader["Etapa"].ToString(),
+
+                    });
+                }
+                con.Close();
+                return lista;
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("No se pudo listar el catalogo de etapas. Detalles del error: " + ex.Message);
+            }
+        }
+
+
     }
 }

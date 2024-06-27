@@ -100,14 +100,13 @@ namespace ApiCore.Controllers
             cmd.Parameters.Add("@IdGrado", System.Data.SqlDbType.Int).Value = inventario.IdGrado;
             cmd.Parameters.Add("@IdEstatus", System.Data.SqlDbType.Int).Value = inventario.IdEstatus;
             cmd.Parameters.Add("@Operacion", System.Data.SqlDbType.Char,1).Value = inventario.TipoRegistro;
-                //var returnValueParameter = new SqlParameter("@ReturnValue", SqlDbType.Int);
-                //cmd.Parameters.Add(returnValueParameter);
+
 
             con.Open();
              int i = 0;
              i = cmd.ExecuteNonQuery();
             con.Close();
-                //int valorRetorno = (int)returnValueParameter.Value;
+
 
             if (i == -1)
             {
