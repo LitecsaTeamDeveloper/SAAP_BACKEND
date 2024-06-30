@@ -31,8 +31,10 @@ namespace ApiCore.Controllers
                     SqlCommand cmd = new SqlCommand("dbo.SPMueveTP", con);
                     cmd.CommandType = System.Data.CommandType.StoredProcedure;
                     cmd.Parameters.Add("@idtubo", System.Data.SqlDbType.VarChar, 30).Value = idInventarioItem.Id;
-                    cmd.Parameters.Add("@idubicacion", System.Data.SqlDbType.VarChar, 30).Value = inventarioOperacion.IdUbicacion;
-                    cmd.Parameters.Add("@idpozo", System.Data.SqlDbType.Int).Value = inventarioOperacion.IdPozo;
+                    cmd.Parameters.Add("@idubicacionOri", System.Data.SqlDbType.VarChar, 30).Value = inventarioOperacion.IdUbicacionOri;
+                    cmd.Parameters.Add("@idubicacionDes", System.Data.SqlDbType.VarChar, 30).Value = inventarioOperacion.IdUbicacionDest;
+                    cmd.Parameters.Add("@idpozoOri", System.Data.SqlDbType.Int).Value = inventarioOperacion.IdPozoOri;
+                    cmd.Parameters.Add("@idpozoDes", System.Data.SqlDbType.Int).Value = inventarioOperacion.IdPozoDest;
 
                     int i = cmd.ExecuteNonQuery();
 
